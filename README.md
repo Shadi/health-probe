@@ -11,7 +11,7 @@ during runtime using the API `/urls`:`/urls?urls=https://pingchck.co&urls=https:
 ## API
 
 * `/urls` endpoint to update urls list: `/urls?urls=https://pingchck.co&urls=https://s13h.xyz`
-* `/add` add url to existing list during runtime: `/add?urls=https://pingchck.co`
+* `/add` add url to existing list during runtime: `/add?url=https://pingchck.co`
 * `/` to list current urls
 * `/metrics` Prometheus metrics
 
