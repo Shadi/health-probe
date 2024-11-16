@@ -27,7 +27,12 @@ during runtime using the API `/urls`:`/urls?urls=https://pingchck.co&urls=https:
 
 * `response_code{response_code="200",url="https://pingchck.co"}` a counter of each url response type
 
-##
+###
+public docker image is available on ghcr:
+```
+docker pull ghcr.io/shadi/health-probe:latest
+```
+
 Test using go:
 `go run .`
 
