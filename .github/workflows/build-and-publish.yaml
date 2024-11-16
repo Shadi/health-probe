@@ -1,0 +1,66 @@
+name: Build and Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: false
+        description: Docker image tags
+        default: latest
+env:
+  DEFAULT_TAG: latest
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.21'
+
+      - name: Go Build
+        run: CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-w -s" -o health_probe
+
+      - name: Run vet & lint
+        run: |
+          go vet .
+
+  release:
+    needs: build
+    name: Release Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3      
+
+      - name: 'Login to ghcr'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Set short git commit SHA
+        id: vars
+        run: |
+          short=$(git rev-parse --short ${{ github.sha }})
+          echo "::set-output name=short_sha::$short"      
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: | 
+            ghcr.io/shadi/health-probe:latest
+            ghcr.io/shadi/health-probe:${{ steps.vars.outputs.short_sha }}
